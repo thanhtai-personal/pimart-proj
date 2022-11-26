@@ -1,0 +1,129 @@
+{
+    "contractName": "TokenInfo",
+    "abi": [
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "token_",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "pair_",
+                    "type": "address"
+                }
+            ],
+            "name": "testTokenInfo",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "components": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "buy",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "sell",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "transfer",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "internalType": "struct TokenInfo.STokenFee",
+                            "name": "fee",
+                            "type": "tuple"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "totalBurnt",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "totalSupply",
+                            "type": "uint256"
+                        }
+                    ],
+                    "internalType": "struct TokenInfo.STokenInfo",
+                    "name": "",
+                    "type": "tuple"
+                }
+            ],
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "buyer",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "seller",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "tokenInfo",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "uint256",
+                            "name": "buy",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "sell",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "transfer",
+                            "type": "uint256"
+                        }
+                    ],
+                    "internalType": "struct TokenInfo.STokenFee",
+                    "name": "fee",
+                    "type": "tuple"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "totalBurnt",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "totalSupply",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ]
+}

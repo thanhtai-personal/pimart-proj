@@ -1,0 +1,149 @@
+@font-face {
+  font-family: "SVN-Agency FB";
+  src: url("./fonts/SVN-Agency FB.ttf") format("truetype");
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "SVN-Agency FB";
+  src: url("./fonts/SVN-Agency FB bold.ttf") format("truetype");
+  font-weight: bold;
+}
+
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("./fonts/Satoshi-Variable.ttf") format("truetype");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "Satoshi italic";
+  src: url("./fonts/Satoshi-VariableItalic.ttf") format("truetype");
+  font-weight: bold;
+}
+
+html {
+}
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background:#1C1D25 !important;
+  color: white !important;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+a {
+  color: inherit; /* blue colors for links too */
+  text-decoration: inherit; /* no underline */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3) ! !important;
+}
+
+::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #737585 !important;
+  opacity: 0.8 !important; /* Firefox */
+}
+
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #737585 !important;
+}
+
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #9fa9c8 !important;
+}
+
+.__react_component_tooltip.show {
+  opacity: 1 !important;
+  max-width: 350px !important;
+}
+
+.MuiButton-contained.Mui-disabled {
+  background-color: #77818b !important;
+  color: white !important;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.dark {
+  background: #303030;
+}
+
+.Mui-error {
+  border: none !important;
+}
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #23242E;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #18171E;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #18171E;
+}
+
+.pulsatingDot {
+  animation: pulseDot 1.25s cubic-bezier(0.455, 0.03, 0.515, 0.955) -.4s infinite;
+  background-color: var(--pulsating-dot, #00BEFF);
+  border-radius: 50%;
+  box-sizing: border-box;
+  height: 10px;
+  width: 10px;
+}
+
+.pulsatingDot:before {
+  animation: pulseRing 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  background-color: var(--pulsating-dot, #00BEFF);
+  border-radius: 45px;
+  content: '';
+  display: block;
+  height: 300%;
+  left: -100%;
+  position: relative;
+  top: -100%;
+  width: 300%;
+}
+
+@keyframes pulseRing {
+  0% { transform: scale(.5); }
+  80%, 100% { opacity: 0; }
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
