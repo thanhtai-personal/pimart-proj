@@ -682,7 +682,7 @@ const DailyAccounting = (props) => {
                   overflow: "hidden",
                 }}
               >
-                <Flex column mt={4}>
+                <Flex column mt={4} className={styles.printContent}>
                   <Flex width={"100%"} center>
                     <Text
                       fontFamily={`'Maven Pro', sans-serif`}
@@ -1143,6 +1143,11 @@ const useStyles = makeStyles((theme: AppTheme) => createStyles({
   },
   actionsBar: {
 
+  },
+  printContent: {
+    backgroundImage: "url(/images/pimart.png)",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center",
   }
 }))
 
