@@ -223,6 +223,16 @@ const DailyAccounting = (props) => {
             top={20}
             centerY
           >
+            <Button variant="info" onClick={() => {
+              window.open("https://chpi.kiotviet.vn/sale/#/", "sale_page")
+            }}>
+              <Text>Bán hàng</Text>
+            </Button>
+            <Button variant="info" onClick={() => {
+              window.open("https://chpi.kiotviet.vn/man/#/DashBoard", "admin_page")
+            }}>
+              <Text>Quản lý</Text>
+            </Button>
             {state.type === ExportType.full && <Button
               variant={"outlined"}
               onClick={() => {
