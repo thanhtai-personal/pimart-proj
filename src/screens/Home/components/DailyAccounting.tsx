@@ -270,7 +270,7 @@ const DailyAccounting = (props) => {
             <Text
               fontFamily={"'Creepster', cursive"}
               fontWeight={700}
-              fontSize={34}
+              fontSize={46}
               lineHeight={"40px"}
             >
               PI MART
