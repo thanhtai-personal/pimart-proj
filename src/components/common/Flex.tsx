@@ -49,19 +49,19 @@ const Flex = (props: FlexProps) => {
     children,
     ...rest
   } = props;
-  let centerProps: any = {};
+  let alignmentProps: any = {};
   if (center) {
-    centerProps["justifyContent"] = "center";
-    centerProps["alignItems"] = "center";
+    alignmentProps["justifyContent"] = "center";
+    alignmentProps["alignItems"] = "center";
   }
   if (centerX) {
-    centerProps["justifyContent"] = "center";
+    alignmentProps["justifyContent"] = "center";
   }
   if (centerY) {
-    centerProps["alignItems"] = "center";
+    alignmentProps["alignItems"] = "center";
   }
   if (column) {
-    centerProps["flexDirection"] = "column";
+    alignmentProps["flexDirection"] = "column";
   }
 
   //@ts-ignore
@@ -87,7 +87,7 @@ const Flex = (props: FlexProps) => {
     <Box
       display="flex"
       style={style}
-      {...centerProps}
+      {...alignmentProps}
       {...colorProps}
       {...rest}
     >

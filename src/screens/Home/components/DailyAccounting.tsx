@@ -222,49 +222,73 @@ const DailyAccounting = (props) => {
             right={1}
             top={20}
             centerY
+            maxWidth={"40%"}
+            flexWrap="wrap"
+            column
+            alignItems={"flex-end"}
           >
-            <Button variant="danger" onClick={() => {
-              window.open("https://chpi.kiotviet.vn/sale/#/", "sale_page")
-            }}>
-              <Text>Bán hàng</Text>
-            </Button>
-            <Button variant="danger" onClick={() => {
-              window.open("https://chpi.kiotviet.vn/man/#/DashBoard", "admin_page")
-            }}>
-              <Text>Quản lý</Text>
-            </Button>
-            {state.type === ExportType.full && <Button
-              variant={"outlined"}
-              onClick={() => {
-                const dataBackup = localStorage.getItem(`half-data-backup-${moment().format("DD_MM_YYYY")}`);
-                state.halfData = JSON.parse(dataBackup || "{}");
-                localStorage.setItem(`half-data-${moment().format("DD_MM_YYYY")}`, dataBackup || "{}")
-              }}
-              disabled={state.loadingSubmit}
-              style={{ marginRight: ".5rem" }}
-            >
-              <Text
-                fontFamily={`'Maven Pro', sans-serif`}
-                fontSize={18}
-                lineHeight={"24px"}
-                color="steelblue"
+            <Flex justifyContent={"flex-end"}>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  window.open("https://chpi.kiotviet.vn/sale/#/", "sale_page");
+                }}
               >
-                Lấy lại dữ liệu ca sáng
-              </Text>
-            </Button>}
-            <Button
-              variant={"primary"}
-              onClick={handleSubmit}
-              disabled={state.loadingSubmit}
-            >
-              <Text
-                fontFamily={`'Maven Pro', sans-serif`}
-                fontSize={18}
-                lineHeight={"24px"}
+                <Text>Bán hàng</Text>
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  window.open(
+                    "https://chpi.kiotviet.vn/man/#/DashBoard",
+                    "admin_page"
+                  );
+                }}
               >
-                {state.type === ExportType.half ? "Lưu" : "Xuất phiếu"}
-              </Text>
-            </Button>
+                <Text>Quản lý</Text>
+              </Button>
+            </Flex>
+            <Flex justifyContent={"flex-end"} mt={1}>
+              {state.type === ExportType.full && (
+                <Button
+                  variant={"outlined"}
+                  onClick={() => {
+                    const dataBackup = localStorage.getItem(
+                      `half-data-backup-${moment().format("DD_MM_YYYY")}`
+                    );
+                    state.halfData = JSON.parse(dataBackup || "{}");
+                    localStorage.setItem(
+                      `half-data-${moment().format("DD_MM_YYYY")}`,
+                      dataBackup || "{}"
+                    );
+                  }}
+                  disabled={state.loadingSubmit}
+                  style={{ marginRight: ".5rem" }}
+                >
+                  <Text
+                    fontFamily={`'Maven Pro', sans-serif`}
+                    fontSize={18}
+                    lineHeight={"24px"}
+                    color="steelblue"
+                  >
+                    Lấy lại dữ liệu ca sáng
+                  </Text>
+                </Button>
+              )}
+              <Button
+                variant={"primary"}
+                onClick={handleSubmit}
+                disabled={state.loadingSubmit}
+              >
+                <Text
+                  fontFamily={`'Maven Pro', sans-serif`}
+                  fontSize={18}
+                  lineHeight={"24px"}
+                >
+                  {state.type === ExportType.half ? "Lưu" : "Xuất phiếu"}
+                </Text>
+              </Button>
+            </Flex>
           </Flex>
           <Flex center mt={2} column>
             <Text
@@ -563,45 +587,49 @@ const DailyAccounting = (props) => {
                   </Flex>
                 </Flex>
               </Flex>
-              {state.type === ExportType.full && <Flex column m={1} mt={2} mr={4}>
-                <Text
-                  fontFamily={`'Maven Pro', sans-serif`}
-                  className={styles.label}
-                >
-                  Tiền quỷ hôm nay (để lại két)
-                </Text>
-                <Flex position={"relative"}>
-                  <TextField
-                    tabIndex={12}
-                    fullWidth
-                    style={{
-                      paddingRight: 250,
-                    }}
-                    onChange={(e) => {
-                      state.todayCashMoney = e.target.value;
-                    }}
-                    className={styles.input}
-                    inputProps={{
-                      type: "number",
-                    }}
-                  />
-                  <Flex
-                    width={250}
-                    justifyContent={"flex-end"}
-                    px={1}
-                    bgcolor={"rgba(0,0,0, 0.7)"}
-                    position={"absolute"}
-                    right={0}
-                    top={0}
-                    height={"100%"}
-                    centerY
+              {state.type === ExportType.full && (
+                <Flex column m={1} mt={2} mr={4}>
+                  <Text
+                    fontFamily={`'Maven Pro', sans-serif`}
+                    className={styles.label}
                   >
-                    <Text>
-                      {numberFormat.format(parseFloat(state.todayCashMoney || "0"))}
-                    </Text>
+                    Tiền quỷ hôm nay (để lại két)
+                  </Text>
+                  <Flex position={"relative"}>
+                    <TextField
+                      tabIndex={12}
+                      fullWidth
+                      style={{
+                        paddingRight: 250,
+                      }}
+                      onChange={(e) => {
+                        state.todayCashMoney = e.target.value;
+                      }}
+                      className={styles.input}
+                      inputProps={{
+                        type: "number",
+                      }}
+                    />
+                    <Flex
+                      width={250}
+                      justifyContent={"flex-end"}
+                      px={1}
+                      bgcolor={"rgba(0,0,0, 0.7)"}
+                      position={"absolute"}
+                      right={0}
+                      top={0}
+                      height={"100%"}
+                      centerY
+                    >
+                      <Text>
+                        {numberFormat.format(
+                          parseFloat(state.todayCashMoney || "0")
+                        )}
+                      </Text>
+                    </Flex>
                   </Flex>
                 </Flex>
-              </Flex>}
+              )}
               <Flex column m={1} mt={2} mr={4}>
                 <Text
                   fontFamily={`'Maven Pro', sans-serif`}
@@ -1050,7 +1078,9 @@ const DailyAccounting = (props) => {
                           color="black"
                           fontSize={22}
                         >
-                          {numberFormat.format(parseFloat(state.todayCashMoney || "0"))}
+                          {numberFormat.format(
+                            parseFloat(state.todayCashMoney || "0")
+                          )}
                         </Text>
                       </Flex>
                     </Flex>
