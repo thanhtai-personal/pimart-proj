@@ -121,7 +121,7 @@ const DailyAccounting = (props) => {
         variant: "success",
       });
       const dataExport = {
-        day: moment().format("DD/MM/YYYY"),
+        day: moment().format("HH:mm DD/MM/YYYY"),
         cashBoxMoney,
         bankingMoney: state.bankingMoney,
         actualRevenue:
@@ -139,6 +139,7 @@ const DailyAccounting = (props) => {
           parseFloat(state.otherRevenue || "0") -
           parseFloat(state.revenue || "0"),
         note: state.note,
+        todayCashMoney: state.todayCashMoney,
       };
       state.dataExport = dataExport;
       setTimeout(() => {
@@ -149,8 +150,19 @@ const DailyAccounting = (props) => {
       }, 100)
       state.loadingSubmit = true;
       try {
-        autoForm(dataExport)
-        .then((data) => {
+        autoForm({
+          "NGÀY": dataExport.day,
+          "TIỀN TRONG KÉT": dataExport.cashBoxMoney,
+          "TIỀN CHUYỂN KHOẢN": dataExport.bankingMoney,
+          "DOANH THU THỰC NHẬN": dataExport.actualRevenue,
+          "DOANH THU (KIOTVIET)": dataExport.revenue,
+          "CHI PHÍ KHÁC": dataExport.otherMoney,
+          "THU NHẬP KHÁC": dataExport.otherRevenue,
+          "LỆCH": dataExport.deviant,
+          "ĐỂ LẠI KÉT": dataExport.todayCashMoney,
+          "GHI CHÚ": dataExport.note,
+        })
+        .then((response) => {
           state.loadingSubmit = false;
           NotiStackInstance.push({
             children: "Đã lưu kết ca ngày",
@@ -1069,7 +1081,7 @@ const DailyAccounting = (props) => {
                           color="black"
                           fontSize={22}
                         >
-                          {numberFormat.format(0)}
+                          {numberFormat.format(state.todayCashMoney || "0")}
                         </Text>
                       </Flex>
                       <Flex flex={1} justifyContent={"flex-end"}>

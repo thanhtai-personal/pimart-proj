@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { AppTheme } from "styles/theme";
 import GalaxyBackground from "./GalaxyBackground";
-import DailyAccounting from "./components/DailyAccounting"
+import DailyAccounting from "./components/DailyAccounting";
 
 interface HomePageProps {}
 
