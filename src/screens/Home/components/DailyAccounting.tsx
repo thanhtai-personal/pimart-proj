@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { AppTheme, Colors } from "styles/theme";
 import { NotiStackInstance } from "App";
 import ReactToPrint from "react-to-print";
-import { autoForm } from "api/users";
+import { autoForm, saveMorningData } from "api/users";
 
 const ExportType = {
   half: "halfDay",
@@ -33,6 +33,7 @@ const DailyAccounting = (props) => {
     "100k": "0",
     "200k": "0",
     "500k": "0",
+    saveToBankMoney: "0",
     note: "",
     type: ExportType.half,
     halfData: {} as any,
@@ -80,29 +81,82 @@ const DailyAccounting = (props) => {
     state.type
   ])
 
+  const handleExportMorning = () => {
+    setTimeout(() => {
+      const printBtn = document.getElementById("print-btn");
+      if (printBtn) {
+        printBtn.click()
+      }
+    }, 100)
+  }
+
   const handleSubmit = (e) => {
     if (state.type === ExportType.half) {
+      const dataSave = {
+        bankingMoney: state.bankingMoney,
+        yesterdayMoney: state.yesterdayMoney,
+        todayCashMoney: state.todayCashMoney,
+        revenue: state.revenue,
+        otherMoney: state.otherMoney,
+        otherRevenue: state.otherRevenue,
+        "1k": state["1k"],
+        "2k": state["2k"],
+        "5k": state["5k"],
+        "10k": state["10k"],
+        "20k": state["20k"],
+        "50k": state["50k"],
+        "100k": state["100k"],
+        "200k": state["200k"],
+        "500k": state["500k"],
+        note: state.note,
+        cashBoxMoney,
+      }
+      try {
+        saveMorningData({
+          NGÀY: moment().format("DD/MM/YYYY HH:mm:ss"),
+          "TIỀN TRONG KÉT": dataSave.cashBoxMoney,
+          "TIỀN CHUYỂN KHOẢN": dataSave.bankingMoney,
+          "DOANH THU THỰC NHẬN":
+            parseFloat(state.bankingMoney || "0") +
+            parseFloat(cashBoxMoney || "0") -
+            parseFloat(state.yesterdayMoney || "0"),
+          "DOANH THU (KIOTVIET)": dataSave.revenue,
+          "CHI PHÍ KHÁC": dataSave.otherMoney,
+          "THU NHẬP KHÁC": dataSave.otherRevenue,
+          LỆCH:
+            parseFloat(state.bankingMoney || "0") +
+            parseFloat(cashBoxMoney || "0") -
+            parseFloat(state.yesterdayMoney || "0") +
+            parseFloat(state.otherMoney || "0") -
+            parseFloat(state.otherRevenue || "0") -
+            parseFloat(state.revenue || "0"),
+          "ĐỂ LẠI KÉT (HÔM QUA)": state.yesterdayMoney,
+          "GHI CHÚ": dataSave.note,
+        })
+          .then((response) => {
+            state.loadingSubmit = false;
+            NotiStackInstance.push({
+              children: "Đã lưu kết ca ngày",
+              variant: "success",
+            });
+          })
+          .catch((error) => {
+            state.loadingSubmit = false;
+            NotiStackInstance.push({
+              children: "Chưa lưu kết ca ngày",
+              variant: "error",
+            });
+          });
+      } catch (error) {
+        state.loadingSubmit = false;
+        NotiStackInstance.push({
+          children: "Chưa lưu kết ca ngày",
+          variant: "error",
+        });
+      }
       localStorage.setItem(
         `half-data-${moment().format("DD_MM_YYYY")}`,
-        JSON.stringify({
-          bankingMoney: state.bankingMoney,
-          yesterdayMoney: state.yesterdayMoney,
-          todayCashMoney: state.todayCashMoney,
-          revenue: state.revenue,
-          otherMoney: state.otherMoney,
-          otherRevenue: state.otherRevenue,
-          "1k": state["1k"],
-          "2k": state["2k"],
-          "5k": state["5k"],
-          "10k": state["10k"],
-          "20k": state["20k"],
-          "50k": state["50k"],
-          "100k": state["100k"],
-          "200k": state["200k"],
-          "500k": state["500k"],
-          note: state.note,
-          cashBoxMoney,
-        })
+        JSON.stringify(dataSave)
       );
       NotiStackInstance.push({
         children: "Đã lưu kết ca sáng",
@@ -140,6 +194,12 @@ const DailyAccounting = (props) => {
           parseFloat(state.revenue || "0"),
         note: state.note,
         todayCashMoney: state.todayCashMoney,
+        yestodayCashMoney: state.yesterdayMoney,
+        saveToBankMoney: (
+          parseFloat(cashBoxMoney) + 
+          parseFloat(state.yesterdayMoney) -
+          parseFloat(state.todayCashMoney)
+        )
       };
       state.dataExport = dataExport;
       setTimeout(() => {
@@ -147,7 +207,7 @@ const DailyAccounting = (props) => {
         if (printBtn) {
           printBtn.click()
         }
-      }, 100)
+      }, 100);
       state.loadingSubmit = true;
       try {
         autoForm({
@@ -161,6 +221,8 @@ const DailyAccounting = (props) => {
           "LỆCH": dataExport.deviant,
           "ĐỂ LẠI KÉT": dataExport.todayCashMoney,
           "GHI CHÚ": dataExport.note,
+          "ĐỂ LẠI KÉT (HÔM QUA)": dataExport.yestodayCashMoney,
+          "TIỀN GỬI NGÂN HÀNG": dataExport.saveToBankMoney,
         })
         .then((response) => {
           state.loadingSubmit = false;
@@ -300,6 +362,20 @@ const DailyAccounting = (props) => {
                   {state.type === ExportType.half ? "Lưu" : "Xuất phiếu"}
                 </Text>
               </Button>
+              {state.type === ExportType.half && (<Button
+                variant={"primary"}
+                onClick={handleExportMorning}
+                disabled={state.loadingSubmit}
+                style={{ marginLeft: 16 }}
+              >
+                <Text
+                  fontFamily={`'Maven Pro', sans-serif`}
+                  fontSize={18}
+                  lineHeight={"24px"}
+                >
+                  Xuất phiếu
+                </Text>
+              </Button>)}
             </Flex>
           </Flex>
           <Flex center mt={2} column>
@@ -524,7 +600,7 @@ const DailyAccounting = (props) => {
                   fontFamily={`'Maven Pro', sans-serif`}
                   className={styles.label}
                 >
-                  Tiền quỷ hôm qua
+                  Để lại két (hôm qua)
                 </Text>
                 <Flex position={"relative"}>
                   <TextField
@@ -605,7 +681,7 @@ const DailyAccounting = (props) => {
                     fontFamily={`'Maven Pro', sans-serif`}
                     className={styles.label}
                   >
-                    Tiền quỷ hôm nay (để lại két)
+                    Để lại két
                   </Text>
                   <Flex position={"relative"}>
                     <TextField
@@ -750,7 +826,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           Ca sáng
                         </Text>
@@ -759,7 +835,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           Cả ngày
                         </Text>
@@ -771,7 +847,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         Tiền két:
                       </Text>
@@ -781,7 +857,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.full
@@ -794,7 +870,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.half
@@ -810,7 +886,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         Tiền CK:
                       </Text>
@@ -820,7 +896,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.full
@@ -833,7 +909,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.half
@@ -849,7 +925,40 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
+                      >
+                        Để lại két (hôm qua):
+                      </Text>
+                    </Flex>
+                    <Flex flex={3} px={1}>
+                      <Flex flex={1} justifyContent={"flex-end"}>
+                        <Text
+                          fontFamily={`'Maven Pro', sans-serif`}
+                          color="black"
+                          fontSize={18}
+                        >
+                          {numberFormat.format(state.yesterdayMoney || "0")}
+                        </Text>
+                      </Flex>
+                      <Flex flex={1} justifyContent={"flex-end"}>
+                        <Text
+                          fontFamily={`'Maven Pro', sans-serif`}
+                          color="black"
+                          fontSize={18}
+                        >
+                          {numberFormat.format(
+                            parseFloat(state.yesterdayMoney || "0")
+                          )}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  </Flex>
+                  <Flex width={"100%"} mt={1} centerY>
+                    <Flex flex={1} justifyContent="flex-end" px={1}>
+                      <Text
+                        fontFamily={`'Maven Pro', sans-serif`}
+                        color="black"
+                        fontSize={18}
                       >
                         DT thực nhận:
                       </Text>
@@ -859,7 +968,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.full
@@ -874,7 +983,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.half
@@ -892,7 +1001,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         Doanh thu:
                       </Text>
@@ -902,7 +1011,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.full
@@ -915,7 +1024,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.half
@@ -931,7 +1040,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         Chi phí khác:
                       </Text>
@@ -941,7 +1050,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.full
@@ -954,7 +1063,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.half
@@ -970,7 +1079,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         Thu nhập khác:
                       </Text>
@@ -980,7 +1089,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.full
@@ -993,7 +1102,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.half
@@ -1009,7 +1118,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         Lệch:
                       </Text>
@@ -1019,7 +1128,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.full
@@ -1048,7 +1157,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             state.type === ExportType.half
@@ -1069,7 +1178,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         Để lại két:
                       </Text>
@@ -1079,7 +1188,7 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(state.todayCashMoney || "0")}
                         </Text>
@@ -1088,10 +1197,46 @@ const DailyAccounting = (props) => {
                         <Text
                           fontFamily={`'Maven Pro', sans-serif`}
                           color="black"
-                          fontSize={22}
+                          fontSize={18}
                         >
                           {numberFormat.format(
                             parseFloat(state.todayCashMoney || "0")
+                          )}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  </Flex>
+                  <Flex width={"100%"} mt={1} centerY>
+                    <Flex flex={1} justifyContent="flex-end" px={1}>
+                      <Text
+                        fontFamily={`'Maven Pro', sans-serif`}
+                        color="black"
+                        fontSize={18}
+                      >
+                        Nộp ngân hàng:
+                      </Text>
+                    </Flex>
+                    <Flex flex={3} px={1}>
+                      <Flex flex={1} justifyContent={"flex-end"}>
+                        <Text
+                          fontFamily={`'Maven Pro', sans-serif`}
+                          color="black"
+                          fontSize={18}
+                        >
+                          {numberFormat.format(
+                            (parseFloat(cashBoxMoney || "0") -
+                              parseFloat(state.todayCashMoney || "0")) || "0"
+                          )}
+                        </Text>
+                      </Flex>
+                      <Flex flex={1} justifyContent={"flex-end"}>
+                        <Text
+                          fontFamily={`'Maven Pro', sans-serif`}
+                          color="black"
+                          fontSize={18}
+                        >
+                          {numberFormat.format(
+                            parseFloat(state.saveToBankMoney || "0")
                           )}
                         </Text>
                       </Flex>
@@ -1101,7 +1246,7 @@ const DailyAccounting = (props) => {
                     <Text
                       fontFamily={`'Maven Pro', sans-serif`}
                       color="black"
-                      fontSize={22}
+                      fontSize={18}
                     >
                       Ghi chú:
                     </Text>
@@ -1123,7 +1268,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                         textAlign={"center"}
                       >
                         Quản lý
@@ -1131,7 +1276,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         (Ký và ghi rõ họ tên)
                       </Text>
@@ -1144,7 +1289,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                         textAlign={"center"}
                       >
                         Nhân viên
@@ -1152,7 +1297,7 @@ const DailyAccounting = (props) => {
                       <Text
                         fontFamily={`'Maven Pro', sans-serif`}
                         color="black"
-                        fontSize={22}
+                        fontSize={18}
                       >
                         (Ký và ghi rõ họ tên)
                       </Text>
