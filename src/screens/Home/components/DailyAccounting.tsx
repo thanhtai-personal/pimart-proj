@@ -33,7 +33,6 @@ const DailyAccounting = (props) => {
     "100k": "0",
     "200k": "0",
     "500k": "0",
-    saveToBankMoney: "0",
     note: "",
     type: ExportType.half,
     halfData: {} as any,
@@ -90,6 +89,30 @@ const DailyAccounting = (props) => {
     }, 100)
   }
 
+  const handleKeyEnter = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+      const maxTabIndex = 15;
+      const nextTabIndex =
+        parseInt(e.target.tabIndex || "0") + 1 > maxTabIndex
+          ? 1
+          : parseInt(e.target.tabIndex || "0") + 1;
+      const findNextElement = (defaultIndex) => {
+        const _nextElement = document.querySelector(`input[tabIndex='${defaultIndex}']`);
+        if (_nextElement) {
+          return _nextElement;
+        } else {
+          return findNextElement((defaultIndex + 1) > maxTabIndex ? 1 : (defaultIndex + 1))
+        }
+      }
+      const nextElement = findNextElement(nextTabIndex);
+      if (nextElement) {
+        nextElement.focus();
+      }
+    }
+  }
+
   const handleSubmit = (e) => {
     if (state.type === ExportType.half) {
       const dataSave = {
@@ -136,21 +159,21 @@ const DailyAccounting = (props) => {
           .then((response) => {
             state.loadingSubmit = false;
             NotiStackInstance.push({
-              children: "Đã lưu kết ca ngày",
+              children: "Đã lưu kết ca sáng",
               variant: "success",
             });
           })
           .catch((error) => {
             state.loadingSubmit = false;
             NotiStackInstance.push({
-              children: "Chưa lưu kết ca ngày",
+              children: "Chưa lưu kết ca sáng",
               variant: "error",
             });
           });
       } catch (error) {
         state.loadingSubmit = false;
         NotiStackInstance.push({
-          children: "Chưa lưu kết ca ngày",
+          children: "Chưa lưu kết ca sáng",
           variant: "error",
         });
       }
@@ -158,10 +181,6 @@ const DailyAccounting = (props) => {
         `half-data-${moment().format("DD_MM_YYYY")}`,
         JSON.stringify(dataSave)
       );
-      NotiStackInstance.push({
-        children: "Đã lưu kết ca sáng",
-        variant: "success",
-      });
     } else {
       localStorage.setItem(
         `half-data-backup-${moment().format("DD_MM_YYYY")}`,
@@ -196,8 +215,7 @@ const DailyAccounting = (props) => {
         todayCashMoney: state.todayCashMoney,
         yestodayCashMoney: state.yesterdayMoney,
         saveToBankMoney: (
-          parseFloat(cashBoxMoney) + 
-          parseFloat(state.yesterdayMoney) -
+          parseFloat(cashBoxMoney) -
           parseFloat(state.todayCashMoney)
         )
       };
@@ -327,14 +345,15 @@ const DailyAccounting = (props) => {
                 <Button
                   variant={"outlined"}
                   onClick={() => {
-                    const dataBackup = localStorage.getItem(
+                    let dataBackup = localStorage.getItem(
                       `half-data-backup-${moment().format("DD_MM_YYYY")}`
                     );
+                    if (!dataBackup) {
+                      dataBackup = localStorage.getItem(
+                        `half-data-${moment().format("DD_MM_YYYY")}`
+                      );
+                    }
                     state.halfData = JSON.parse(dataBackup || "{}");
-                    localStorage.setItem(
-                      `half-data-${moment().format("DD_MM_YYYY")}`,
-                      dataBackup || "{}"
-                    );
                   }}
                   disabled={state.loadingSubmit}
                   style={{ marginRight: ".5rem" }}
@@ -399,13 +418,14 @@ const DailyAccounting = (props) => {
                     500k
                   </Text>
                   <TextField
-                    tabIndex={1}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["500k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 1
                     }}
                   />
                 </Flex>
@@ -417,13 +437,14 @@ const DailyAccounting = (props) => {
                     200k
                   </Text>
                   <TextField
-                    tabIndex={2}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["200k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 2,
                     }}
                   />
                 </Flex>
@@ -435,13 +456,14 @@ const DailyAccounting = (props) => {
                     100k
                   </Text>
                   <TextField
-                    tabIndex={3}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["100k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 3,
                     }}
                   />
                 </Flex>
@@ -453,13 +475,14 @@ const DailyAccounting = (props) => {
                     50k
                   </Text>
                   <TextField
-                    tabIndex={4}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["50k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 4,
                     }}
                   />
                 </Flex>
@@ -471,13 +494,14 @@ const DailyAccounting = (props) => {
                     20k
                   </Text>
                   <TextField
-                    tabIndex={5}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["20k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 5,
                     }}
                   />
                 </Flex>
@@ -489,13 +513,14 @@ const DailyAccounting = (props) => {
                     10k
                   </Text>
                   <TextField
-                    tabIndex={6}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["10k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 6,
                     }}
                   />
                 </Flex>
@@ -507,13 +532,14 @@ const DailyAccounting = (props) => {
                     5k
                   </Text>
                   <TextField
-                    tabIndex={7}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["5k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 7,
                     }}
                   />
                 </Flex>
@@ -525,13 +551,14 @@ const DailyAccounting = (props) => {
                     2k
                   </Text>
                   <TextField
-                    tabIndex={8}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["2k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 8,
                     }}
                   />
                 </Flex>
@@ -543,13 +570,14 @@ const DailyAccounting = (props) => {
                     1k
                   </Text>
                   <TextField
-                    tabIndex={9}
+                    onKeyPress={handleKeyEnter}
                     className={styles.input}
                     onChange={(e) => {
                       state["1k"] = e.target.value || "0";
                     }}
                     inputProps={{
                       type: "number",
+                      tabIndex: 9,
                     }}
                   />
                 </Flex>
@@ -563,7 +591,7 @@ const DailyAccounting = (props) => {
                 </Text>
                 <Flex position={"relative"}>
                   <TextField
-                    tabIndex={10}
+                    onKeyPress={handleKeyEnter}
                     fullWidth
                     style={{
                       paddingRight: 250,
@@ -574,6 +602,7 @@ const DailyAccounting = (props) => {
                     className={styles.input}
                     inputProps={{
                       type: "number",
+                      tabIndex: 10,
                     }}
                   />
                   <Flex
@@ -604,7 +633,7 @@ const DailyAccounting = (props) => {
                 </Text>
                 <Flex position={"relative"}>
                   <TextField
-                    tabIndex={11}
+                    onKeyPress={handleKeyEnter}
                     fullWidth
                     style={{
                       paddingRight: 250,
@@ -615,6 +644,7 @@ const DailyAccounting = (props) => {
                     className={styles.input}
                     inputProps={{
                       type: "number",
+                      tabIndex: 11,
                     }}
                   />
                   <Flex
@@ -645,7 +675,7 @@ const DailyAccounting = (props) => {
                 </Text>
                 <Flex position={"relative"}>
                   <TextField
-                    tabIndex={12}
+                    onKeyPress={handleKeyEnter}
                     fullWidth
                     style={{
                       paddingRight: 250,
@@ -656,6 +686,7 @@ const DailyAccounting = (props) => {
                     className={styles.input}
                     inputProps={{
                       type: "number",
+                      tabIndex: 12,
                     }}
                   />
                   <Flex
@@ -685,7 +716,7 @@ const DailyAccounting = (props) => {
                   </Text>
                   <Flex position={"relative"}>
                     <TextField
-                      tabIndex={12}
+                      onKeyPress={handleKeyEnter}
                       fullWidth
                       style={{
                         paddingRight: 250,
@@ -696,6 +727,7 @@ const DailyAccounting = (props) => {
                       className={styles.input}
                       inputProps={{
                         type: "number",
+                        tabIndex: 13,
                       }}
                     />
                     <Flex
@@ -727,7 +759,7 @@ const DailyAccounting = (props) => {
                 </Text>
                 <Flex position={"relative"}>
                   <TextField
-                    tabIndex={13}
+                    onKeyPress={handleKeyEnter}
                     fullWidth
                     style={{
                       paddingRight: 250,
@@ -738,6 +770,7 @@ const DailyAccounting = (props) => {
                     className={styles.input}
                     inputProps={{
                       type: "number",
+                      tabIndex: 14,
                     }}
                   />
                   <Flex
@@ -766,7 +799,7 @@ const DailyAccounting = (props) => {
                 </Text>
                 <Flex position={"relative"}>
                   <TextField
-                    tabIndex={13}
+                    onKeyPress={handleKeyEnter}
                     fullWidth
                     style={{
                       paddingRight: 250,
@@ -777,6 +810,7 @@ const DailyAccounting = (props) => {
                     className={styles.input}
                     inputProps={{
                       type: "number",
+                      tabIndex: 15,
                     }}
                   />
                   <Flex
@@ -1223,10 +1257,7 @@ const DailyAccounting = (props) => {
                           color="black"
                           fontSize={18}
                         >
-                          {numberFormat.format(
-                            (parseFloat(cashBoxMoney || "0") -
-                              parseFloat(state.todayCashMoney || "0")) || "0"
-                          )}
+                          {}
                         </Text>
                       </Flex>
                       <Flex flex={1} justifyContent={"flex-end"}>
@@ -1236,7 +1267,8 @@ const DailyAccounting = (props) => {
                           fontSize={18}
                         >
                           {numberFormat.format(
-                            parseFloat(state.saveToBankMoney || "0")
+                            (parseFloat(cashBoxMoney || "0") -
+                              parseFloat(state.todayCashMoney || "0")) || "0"
                           )}
                         </Text>
                       </Flex>

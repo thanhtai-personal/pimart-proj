@@ -12,6 +12,7 @@ export const autoForm = async (data) => {
   );
 };
 //https://sheet.best/api/sheets/a8874900-9219-4f1b-aa2d-cc5a11048730
+//https://sheet.best/admin/connection-detail/a8874900-9219-4f1b-aa2d-cc5a11048730
 export const saveMorningData = async (data) => {
   return await backendHttpClient.post(
     "/api/sheets/a8874900-9219-4f1b-aa2d-cc5a11048730",
